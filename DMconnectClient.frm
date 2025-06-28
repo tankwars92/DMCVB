@@ -11,6 +11,11 @@ Begin VB.Form Form1
    ScaleHeight     =   3195
    ScaleWidth      =   4575
    StartUpPosition =   3  'Windows Default
+   Begin VB.Timer tmrPing 
+      Interval        =   5000
+      Left            =   120
+      Top             =   120
+   End
    Begin VB.CommandButton cmdSend 
       Caption         =   "Send"
       Height          =   315
@@ -68,10 +73,6 @@ Private Sub Form_Resize()
     txtLog.Move pad, pad, Me.ScaleWidth - 2 * pad, txtInput.Top - 2 * pad
 End Sub
 
-
-
-
-
 Private Sub txtLog_GotFocus()
     txtInput.SetFocus
 End Sub
@@ -85,6 +86,8 @@ Private Sub Form_Load()
     Winsock1.RemoteHost = "dmconnect.hoho.ws"
     Winsock1.RemotePort = 1112
     Winsock1.Connect
+    
+    tmrPing.Enabled = True
 End Sub
 
 Private Sub txtInput_KeyPress(KeyAscii As Integer)
@@ -102,9 +105,10 @@ Private Sub Winsock1_DataArrival(ByVal bytesTotal As Long)
     Dim data() As String
     Winsock1.GetData msg, vbString
     
-    txtLog.Text = txtLog.Text & vbCrLf & msg
-    
-    ScrollToBottom txtLog
+    If InStr(msg, "*Ping!*") = 0 Then
+        txtLog.Text = txtLog.Text & vbCrLf & msg
+        ScrollToBottom txtLog
+    End If
 End Sub
 
 Private Sub cmdSend_Click()
@@ -112,5 +116,8 @@ Private Sub cmdSend_Click()
     txtInput.Text = ""
 End Sub
 
-
-
+Private Sub tmrPing_Timer()
+    If Winsock1.State = sckConnected Then
+        Winsock1.SendData "/"
+    End If
+End Sub
