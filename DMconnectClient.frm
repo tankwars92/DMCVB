@@ -105,7 +105,7 @@ Private Sub Winsock1_DataArrival(ByVal bytesTotal As Long)
     Dim data() As String
     Winsock1.GetData msg, vbString
     
-    If InStr(msg, "*Ping!*") = 0 Then
+    If InStr(msg, "*Ping!*") = 0 And InStr(msg, "Unknown command.") = 0 Then
         txtLog.Text = txtLog.Text & vbCrLf & msg
         ScrollToBottom txtLog
     End If
